@@ -20,7 +20,7 @@ export class Application {
 	//
 	public constructor() {
 		this.express = new ExpressConfig();
-		this.logger = (new Logger(`Express`, `cyan`)).log;
+		this.logger = (new Logger(`Application`, `cyan`)).log;
 		if ((process.env.MYSQL_ENABLE as string) === "true") {
 			this.logger.info(`MySQL enabled`);
 			MySQL.connect().then();
@@ -54,10 +54,12 @@ export class Application {
 		// this.registerConsul(appHost, appPort, appConsulID, serviceName);
 
 		process.on("uncaughtException", (e: any) => {
+			console.info(`1`,e);
 			this.logger.error(e);
 			process.exit(1);
 		});
 		process.on("unhandledRejection", (e: any) => {
+			console.info(`2`,e);
 			this.logger.error(e);
 			process.exit(1);
 		});

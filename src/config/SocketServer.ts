@@ -4,17 +4,21 @@ import {AddressInfo} from "net";
 import {Message, MsgEvent} from "../socket/constant";
 import {Logger} from "../common/logger";
 import winston from "winston";
+import {MessageProcessor} from "../socket/processor";
 
 export class SocketServer {
 	public static io: SocketIO.Server;
 	public static udpServer: dgram.Socket;
-	private static logger: winston.Logger;
+	public static logger: winston.Logger;
+	private readonly socketPort: number;
+	private socketAddress: string;
 
 	constructor(httpServer: any) {
 		SocketServer.logger = (new Logger(`Socket Server`, "green")).log;
 		SocketServer.io = SocketIO(httpServer);
-		SocketServer.udpServer = dgram.createSocket('udp4');
-		SocketServer.udpServer.bind(12600, '0.0.0.0');
+		SocketServer.udpServer = dgram.createSocket("udp4");
+		this.socketPort = 12600;
+		this.socketAddress = "0.0.0.0"; // 0.0.0.0 means all interface
 		this.socketWorker();
 		this.udpWorker();
 	}
@@ -22,45 +26,17 @@ export class SocketServer {
 	private udpWorker(): void {
 		const udpSvr = SocketServer.udpServer;
 		const ioServer = SocketServer.io;
-		udpSvr.on('listening', function () {
+		udpSvr.on("listening", () => {
 			const address: AddressInfo = udpSvr.address() as AddressInfo;
-			SocketServer.logger.info('UDP Server listening on ' + address.address + ":" + address.port);
+			SocketServer.logger.info("UDP Server listening on " + address.address + ":" + address.port);
 		});
 
-		udpSvr.on('message', function (message, remote) {
-			let messageObject = JSON.parse(message.toString());
-			let body = messageObject.data;
-			let data = {
-				id: 0,
-				message: ``
-			};
-			try {
-				data = JSON.parse(body);
-				if (data.message == "ping") {
-					return;
-				}
-			} catch (e) {
+		udpSvr.on("message", (new MessageProcessor()).process);
 
-			}
-			if (messageObject.scope == "alive") {
-				ioServer.sockets.in('alive').emit('aliveHandler', {data: body});
-				ioServer.sockets.in('relay').emit('relay', {channel: 'alive', 'method': 'aliveHandler', content: body});
-			} else if (messageObject.scope == "rcon") {
-				ioServer.sockets.in('rcon-' + data.id).emit('rconHandler', body);
-			} else if (messageObject.scope == "logger") {
-				ioServer.sockets.in('logger-' + data.id).emit('loggerHandler', body);
-				ioServer.sockets.in('loggersGlobal').emit('loggerGlobalHandler', body);
-			} else if (messageObject.scope == "match") {
-				ioServer.sockets.in('matchs').emit('matchsHandler', body);
-				ioServer.sockets.in('relay').emit('relay', {channel: 'matchs', 'method': 'matchsHandler', content: body});
-			} else if (messageObject.scope == "livemap") {
-				ioServer.sockets.in('livemap-' + data.id).emit('livemapHandler', body);
-				ioServer.sockets.in('relay').emit('relay', {
-					channel: 'livemap-' + data.id,
-					'method': 'livemapHandler',
-					content: body
-				});
-			}
+		SocketServer.udpServer.bind({
+			address: this.socketAddress,
+			port: this.socketPort,
+			exclusive: true,
 		});
 	}
 
@@ -68,8 +44,11 @@ export class SocketServer {
 		SocketServer.io.on(MsgEvent.CONNECT, (socket: any) => {
 			SocketServer.logger.info(`Client connected`);
 
+			socket.on("identify", (data: any) => {
+				console.info(data);
+			});
 			socket.on(MsgEvent.DISCONNECT, () => {
-				SocketServer.logger.info('Client disconnected');
+				SocketServer.logger.info("Client disconnected");
 			});
 		});
 	}

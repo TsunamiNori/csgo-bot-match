@@ -5,7 +5,9 @@ import DailyRotateFile = require("winston-daily-rotate-file");
 export class Logger {
 	public log: winston.Logger;
 
-	constructor(module_name: string = "Application", color: ("cyan" | "yellow" | "red" | "green" | "blue" | "white") = 'white', ignore_level: boolean = false) {
+	constructor(moduleName: string = "Application",
+							color: ("cyan" | "yellow" | "red" | "green" | "blue" | "white") = "white",
+							ignoreLevel: boolean = false) {
 
 		this.log = winston.createLogger({
 			format: winston.format.combine(
@@ -36,28 +38,28 @@ export class Logger {
 
 			switch (color) {
 				case "cyan":
-					module_name = chalk.cyan(`[${module_name}]`);
+					moduleName = chalk.cyan(`[${moduleName}]`);
 					break;
 				case "yellow":
-					module_name = chalk.yellow(`[${module_name}]`);
+					moduleName = chalk.yellow(`[${moduleName}]`);
 					break;
 				case "red":
-					module_name = chalk.red(`[${module_name}]`);
+					moduleName = chalk.red(`[${moduleName}]`);
 					break;
 				case "green":
-					module_name = chalk.green(`[${module_name}]`);
+					moduleName = chalk.green(`[${moduleName}]`);
 					break;
 				case "blue":
-					module_name = chalk.blue(`[${module_name}]`);
+					moduleName = chalk.blue(`[${moduleName}]`);
 					break;
 				case "white":
-					module_name = chalk.white(`[${module_name}]`);
+					moduleName = chalk.white(`[${moduleName}]`);
 					break;
 				default:
-					module_name = `[${module_name}]`;
+					moduleName = `[${moduleName}]`;
 					break;
 			}
-			return `${module_name} ${ignore_level ? '' : `[${level}]`} ${message}`;
+			return `${moduleName} ${ignoreLevel ? "" : `[${level}]`} ${message}`;
 		});
 
 		const timestampFormat = winston.format.timestamp({format: "MM-DD HH:mm:ss.SSSZZ"});

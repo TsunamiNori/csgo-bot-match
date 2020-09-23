@@ -14,7 +14,7 @@ export class ExpressConfig {
 	private static logger: winston.Logger;
 
 	public constructor() {
-		ExpressConfig.logger = (new Logger(`Application`, "green")).log;
+		ExpressConfig.logger = (new Logger(`Express`, "green")).log;
 		this.app = express();
 		this.app.use(bodyParser.urlencoded({extended: false}));
 		this.app.use(bodyParser.json());
