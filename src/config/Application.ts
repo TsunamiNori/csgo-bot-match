@@ -1,6 +1,5 @@
 import * as uuid from "uuid";
 import {Logger} from "../common/logger";
-import {MySQL} from "../database/MySQL";
 import {ExpressConfig} from "./Express";
 // import {MSSQL} from "../database/MSSQL";
 import {MongoDB} from "../database/MongoDB";
@@ -21,14 +20,7 @@ export class Application {
 	public constructor() {
 		this.express = new ExpressConfig();
 		this.logger = (new Logger(`Application`, `cyan`)).log;
-		if ((process.env.MYSQL_ENABLE as string) === "true") {
-			this.logger.info(`MySQL enabled`);
-			MySQL.connect().then();
-		}
-		// if ((process.env.MSSQL_ENABLE as string) === "true") {
-		// 	this.logger.info("MSSQL enabled");
-		// 	MSSQL.connect().then();
-		// }
+
 		if ((process.env.MONGODB_ENABLE as string) === "true") {
 			this.logger.info(`MongoDB enabled`);
 			MongoDB.connect();
@@ -54,13 +46,11 @@ export class Application {
 		// this.registerConsul(appHost, appPort, appConsulID, serviceName);
 
 		process.on("uncaughtException", (e: any) => {
-			console.info(`1`,e);
-			this.logger.error(e);
+			this.logger.error(e.message);
 			process.exit(1);
 		});
 		process.on("unhandledRejection", (e: any) => {
-			console.info(`2`,e);
-			this.logger.error(e);
+			this.logger.error(e.message);
 			process.exit(1);
 		});
 	}

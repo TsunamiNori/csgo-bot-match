@@ -1,7 +1,7 @@
 import SocketIO from "socket.io";
 import dgram from "dgram";
 import {AddressInfo} from "net";
-import {Message, MsgEvent} from "../socket/constant";
+import {MsgEvent} from "../common/constants";
 import {Logger} from "../common/logger";
 import winston from "winston";
 import {MessageProcessor} from "../socket/processor";
