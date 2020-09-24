@@ -29,4 +29,24 @@ export class AuthController extends BaseController {
 			return this.BadRequest(res, e);
 		}
 	}
+
+	@Post("/demo")
+	public async UploadDemo(
+		@Body() data: any,
+		@Req() req: any,
+		@Res() res: any) {
+		try {
+			this.gameRepo.processMessage(data);
+			return this.Ok(res, {
+				data: [],
+				message: ``,
+				status: 200,
+				errorCode: 0,
+				error: false,
+			});
+		} catch (e) {
+			return this.BadRequest(res, e);
+		}
+
+	}
 }

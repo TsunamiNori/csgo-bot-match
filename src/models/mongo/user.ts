@@ -7,7 +7,6 @@ export interface User extends Document {
 	email: string;
 	fullname: string;
 	password: string;
-	phone: string;
 	roles: [string];
 	scopes: [string];
 	username: string;

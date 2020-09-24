@@ -11,7 +11,7 @@ export class SocketServer {
 	public static udpServer: dgram.Socket;
 	public static logger: winston.Logger;
 	private readonly socketPort: number;
-	private socketAddress: string;
+	private readonly socketAddress: string;
 
 	constructor(httpServer: any) {
 		SocketServer.logger = (new Logger(`Socket Server`, "green")).log;
