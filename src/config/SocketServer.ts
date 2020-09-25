@@ -5,6 +5,7 @@ import {MsgEvent} from "../common/constants";
 import {Logger} from "../common/logger";
 import winston from "winston";
 import {MessageProcessor} from "../socket/processor";
+import {Server} from "http";
 
 export class SocketServer {
 	public static io: SocketIO.Server;
@@ -13,11 +14,11 @@ export class SocketServer {
 	private readonly socketPort: number;
 	private readonly socketAddress: string;
 
-	constructor(httpServer: any) {
+	constructor(httpServer: Server, appPort: number) {
 		SocketServer.logger = (new Logger(`Socket Server`, "green")).log;
 		SocketServer.io = SocketIO(httpServer);
 		SocketServer.udpServer = dgram.createSocket("udp4");
-		this.socketPort = 12600;
+		this.socketPort = appPort;
 		this.socketAddress = "0.0.0.0"; // 0.0.0.0 means all interface
 		this.socketWorker();
 		this.udpWorker();
@@ -35,7 +36,7 @@ export class SocketServer {
 
 		SocketServer.udpServer.bind({
 			address: this.socketAddress,
-			port: this.socketPort,
+			port: this.socketPort + 1,
 			exclusive: true,
 		});
 	}

@@ -8,7 +8,7 @@ module.exports = {
 
 		let bodySize = Buffer.byteLength(body);
 		// Add 4 to the size (body + 10) for the null char
-		let buffer = new Buffer(bodySize + 14);
+		let buffer = Buffer.alloc(bodySize + 14);
 		// Substract 4 because the packet size field is not included when
 		// determining the size of the packet
 		buffer.writeInt32LE(buffer.length - 4, 0);

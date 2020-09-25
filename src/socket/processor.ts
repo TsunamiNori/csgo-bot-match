@@ -1,8 +1,4 @@
-import SocketIO from "socket.io";
-import {SocketServer} from "../config/SocketServer";
-import dgram from "dgram";
-import {Logger} from "../common/logger";
-import winston from "winston";
+import {MessageTypeRegex} from "../common/constants";
 
 const MAGIC = {
 	header: Buffer.alloc(4, 255),
@@ -24,23 +20,14 @@ export class MessageProcessor {
 				return undefined;
 			}
 			const processedMsg = message.slice(start + MAGIC.strHeaderEnd.length, message.length - 2).toString();
-			console.log(processedMsg);
-			// Example:
-			// 09/23/2020 - 23:33:59: "Don<5><BOT><TERRORIST>" left buyzone with [ weapon_knife_t weapon_glock weapon_galilar kevlar(100) helmet ]
-
-
-			// const messageObject = JSON.parse(processedMsg);
-			// const body = messageObject.data;
-			// let data = {
-			// 	id: 0,
-			// 	message: ``
-			// };
-			// data = JSON.parse(body);
-			// if (data.message === "ping") {
-			// 	return;
-			// }
+			const msgType = this.messageToType(processedMsg);
 		} catch (e) {
 			console.log(e);
 		}
+	}
+
+	private messageToType(message: string) {
+		Object.keys(MessageTypeRegex).map(x => console.info(x));
+		return message;
 	}
 }

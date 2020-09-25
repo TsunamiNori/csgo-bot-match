@@ -78,7 +78,7 @@ module.exports = (params: any) => {
 
 				let unexpectedPackets: any;
 
-				let responseData = new Buffer(0);
+				let responseData = Buffer.alloc(0);
 				let reqId = _getNextPacketId();
 				let req = packet.request({
 					id: reqId,

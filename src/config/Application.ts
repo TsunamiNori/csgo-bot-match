@@ -1,22 +1,22 @@
 import * as uuid from "uuid";
 import {Logger} from "../common/logger";
 import {ExpressConfig} from "./Express";
-// import {MSSQL} from "../database/MSSQL";
 import {MongoDB} from "../database/MongoDB";
 import {SocketServer} from "./SocketServer";
 import winston from "winston";
-// import RegisterOptions = Consul.Agent.Service.RegisterOptions;
-// import RegisterCheck = Consul.Agent.Service.RegisterCheck;
+import Helper from "../common/helper";
+import MessageType from "../models/message_type";
+import {MessageTypeRegex} from "../common/constants";
+import {Server} from "http";
+
 
 export class Application {
 
-	public server: any;
+	public server: Server;
 	public express: ExpressConfig;
 	public socket: SocketServer;
 	private logger: winston.Logger;
-	// public consulHost: string;
-	// public consulPort: string;
-	//
+
 	public constructor() {
 		this.express = new ExpressConfig();
 		this.logger = (new Logger(`Application`, `cyan`)).log;
@@ -26,9 +26,6 @@ export class Application {
 			MongoDB.connect();
 		}
 
-		// this.consulHost = process.env.CONSUL_HOST || "localhost";
-		// this.consulPort = process.env.CONSUL_PORT || "8500";
-
 		const appPort: number = parseInt(process.env.PORT as string, 0) || 3000;
 
 		const newUuid = uuid.v4();
@@ -37,13 +34,7 @@ export class Application {
 		this.server = this.express.app.listen(appPort, () => {
 			this.logger.info(`CSGO Bot started listening on ${appPort}`);
 		});
-		this.socket = new SocketServer(this.server);
-
-		// Deperacated: Consul Service
-		// const appConsulID = `example-${appHost}-${appPort}-${newUuid}`;
-		// const serviceName = process.env.CONSUL_SERVICE_NAME || newUuid;
-		// Ignored consul, since we dont need it yet
-		// this.registerConsul(appHost, appPort, appConsulID, serviceName);
+		this.socket = new SocketServer(this.server, appPort);
 
 		process.on("uncaughtException", (e: any) => {
 			this.logger.error(e.message);
@@ -53,5 +44,21 @@ export class Application {
 			this.logger.error(e.message);
 			process.exit(1);
 		});
+
+		Object.keys(MessageTypeRegex).forEach(x => {
+			const regex = MessageTypeRegex[x as keyof typeof  MessageTypeRegex];
+		});
+
+
+		// Working RCON
+		// let Rcon = require('../rcon');
+		// let rcon = Rcon({
+		// 	address: '14.177.236.119:20003',
+		// 	password: 'vikings_compe@123#@!'
+		// });
+		// rcon.connect().then(() => {
+		// 	console.log('srcds server connected');
+		// 	rcon.command('say HI FROM vBOT');
+		// }).catch(console.error);
 	}
 }
