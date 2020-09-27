@@ -4,11 +4,12 @@ import DailyRotateFile = require("winston-daily-rotate-file");
 
 export class Logger {
 	public log: winston.Logger;
+	public color: string;
+	private ignoreLevel: boolean;
 
-	constructor(moduleName: string = "Application",
+	constructor(
 							color: ("cyan" | "yellow" | "red" | "green" | "blue" | "white") = "white",
 							ignoreLevel: boolean = false) {
-
 		this.log = winston.createLogger({
 			format: winston.format.combine(
 				winston.format.timestamp(),
@@ -32,34 +33,54 @@ export class Logger {
 				}),
 			],
 		});
+		this.color = color;
+		this.ignoreLevel = ignoreLevel;
+	}
 
+	create() {
 		const formFormat = winston.format.printf(({level, message, timestamp}) => {
 			level = level.toUpperCase();
-
-			switch (color) {
-				case "cyan":
-					moduleName = chalk.cyan(`[${moduleName}]`);
+			switch (level) {
+				case "INFO":
+					level = chalk.white(`[${level}]`);
 					break;
-				case "yellow":
-					moduleName = chalk.yellow(`[${moduleName}]`);
+				case "ERROR":
+					level = chalk.red(`[${level}]`);
 					break;
-				case "red":
-					moduleName = chalk.red(`[${moduleName}]`);
+				case "DEBUG":
+					level = chalk.blueBright(`[${level}]`);
 					break;
-				case "green":
-					moduleName = chalk.green(`[${moduleName}]`);
-					break;
-				case "blue":
-					moduleName = chalk.blue(`[${moduleName}]`);
-					break;
-				case "white":
-					moduleName = chalk.white(`[${moduleName}]`);
+				case "WARN":
+					level = chalk.yellow(`[${level}]`);
 					break;
 				default:
-					moduleName = `[${moduleName}]`;
+					level = chalk.white(`[${level}]`);
 					break;
 			}
-			return `${moduleName} ${ignoreLevel ? "" : `[${level}]`} ${message}`;
+			switch (this.color) {
+				case "cyan":
+					message = chalk.cyan(`${message}`);
+					break;
+				case "yellow":
+					message = chalk.yellow(`${message}`);
+					break;
+				case "red":
+					message = chalk.red(`${message}`);
+					break;
+				case "green":
+					message = chalk.green(`${message}`);
+					break;
+				case "blue":
+					message = chalk.blue(`${message}`);
+					break;
+				case "white":
+					message = chalk.white(`${message}`);
+					break;
+				default:
+					message = `${message}`;
+					break;
+			}
+			return `${this.ignoreLevel ? "" : `${level}`} ${message}`;
 		});
 
 		const timestampFormat = winston.format.timestamp({format: "MM-DD HH:mm:ss.SSSZZ"});
@@ -69,5 +90,6 @@ export class Logger {
 				format: winston.format.combine(timestampFormat, formFormat),
 			}),
 		);
+		return this.log;
 	}
 }

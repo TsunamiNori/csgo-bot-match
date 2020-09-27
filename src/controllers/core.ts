@@ -1,4 +1,4 @@
-import {Body, Controller, Post, Req, Res,} from "routing-controllers";
+import {Body, Controller, Post, Req, Res} from "routing-controllers";
 import {BaseController} from "./base";
 import {GameRepo} from "../repositories/gameRepo";
 

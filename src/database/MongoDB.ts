@@ -13,12 +13,7 @@ class MongoDB {
 	public static dbName: string;
 	public static authDb: string;
 	public static sslEnable: string;
-	private static logger: winston.Logger;
-
-	public constructor() {
-		MongoDB.connect();
-		MongoDB.logger = (new Logger(`Database`, "yellow")).log;
-	}
+	public static logger: winston.Logger = (new Logger("yellow")).create();
 
 	public static connect(): Mongoose.Connection {
 		if (this.mongooseInstance) {
@@ -45,21 +40,22 @@ class MongoDB {
 		this.mongooseConnection = Mongoose.connection;
 
 		this.mongooseConnection.once("open", () => {
-			MongoDB.logger.info("[Database] Connect to an mongodb is opened.");
+			MongoDB.logger.info("Connect to mongodb is opened.");
 		});
 
 		this.mongooseInstance = Mongoose.connect(connectionString, {
 			useCreateIndex: true,
 			useNewUrlParser: true,
+			useUnifiedTopology: true,
 		});
 
 		this.mongooseConnection.on("connected", () => {
-			MongoDB.logger.info("[Database] Mongoose connection opened");
+			MongoDB.logger.info("Mongoose connection opened");
 		});
 
 		// If the connection throws an error
 		this.mongooseConnection.on("error", (msg) => {
-			MongoDB.logger.info("[Database] Mongoose error message:", msg);
+			MongoDB.logger.info("Mongoose error message:", msg);
 		});
 
 		// When the connection is disconnected
@@ -67,12 +63,12 @@ class MongoDB {
 			setTimeout(() => {
 				this.mongooseInstance = Mongoose.connect(connectionString);
 			}, 10000);
-			MongoDB.logger.info("[Database] Mongoose disconnected.");
+			MongoDB.logger.info("Mongoose disconnected.");
 		});
 
 		// When the connection is reconnected
 		this.mongooseConnection.on("reconnected", () => {
-			MongoDB.logger.info("[Database] Mongoose reconnected.");
+			MongoDB.logger.info("Mongoose reconnected.");
 		});
 
 		// If the Node process ends, close the Mongoose connection

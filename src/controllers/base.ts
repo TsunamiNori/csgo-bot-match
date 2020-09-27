@@ -9,9 +9,9 @@ export class BaseController {
 	private logger: winston.Logger;
 
 	constructor() {
-
-		this.logger = (new Logger(`Database`, "yellow")).log;
+		this.logger = (new Logger("yellow")).create();
 	}
+
 	public OkNoData(res: express.Response): any {
 		res.json({
 			message: "SUCCESS",
@@ -47,7 +47,7 @@ export class BaseController {
 	public BadRequest(res: express.Response, e?: any): any {
 		if (e) {
 			console.log(e);
-			this.logger.error(`[Express] Bad request: (${typeof e}) ${typeof e === "object" ? JSON.stringify(e) : e}`);
+			this.logger.error(`Bad request: (${typeof e}) ${typeof e === "object" ? JSON.stringify(e) : e}`);
 		}
 		res.json({
 			message: "BAD_REQUEST",

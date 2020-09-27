@@ -15,32 +15,12 @@ export class SocketServer {
 	private readonly socketAddress: string;
 
 	constructor(httpServer: Server, appPort: number) {
-		SocketServer.logger = (new Logger(`Socket Server`, "green")).log;
+		SocketServer.logger = (new Logger("green")).create();
 		SocketServer.io = SocketIO(httpServer);
-		SocketServer.udpServer = dgram.createSocket("udp4");
 		this.socketPort = appPort;
 		this.socketAddress = "0.0.0.0"; // 0.0.0.0 means all interface
 		this.socketWorker();
-		this.udpWorker();
 	}
-
-	private udpWorker(): void {
-		const udpSvr = SocketServer.udpServer;
-		const ioServer = SocketServer.io;
-		udpSvr.on("listening", () => {
-			const address: AddressInfo = udpSvr.address() as AddressInfo;
-			SocketServer.logger.info("UDP Server listening on " + address.address + ":" + address.port);
-		});
-
-		udpSvr.on("message", (new MessageProcessor()).process);
-
-		SocketServer.udpServer.bind({
-			address: this.socketAddress,
-			port: this.socketPort + 1,
-			exclusive: true,
-		});
-	}
-
 	private socketWorker(): void {
 		SocketServer.io.on(MsgEvent.CONNECT, (socket: any) => {
 			SocketServer.logger.info(`Client connected`);

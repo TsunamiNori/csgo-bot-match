@@ -19,7 +19,8 @@ export class Application {
 
 	public constructor() {
 		this.express = new ExpressConfig();
-		this.logger = (new Logger(`Application`, `cyan`)).log;
+		this.logger = (new Logger(`cyan`)).create();
+		// this.logger = Logger.log;
 
 		if ((process.env.MONGODB_ENABLE as string) === "true") {
 			this.logger.info(`MongoDB enabled`);
@@ -46,7 +47,7 @@ export class Application {
 		});
 
 		Object.keys(MessageTypeRegex).forEach(x => {
-			const regex = MessageTypeRegex[x as keyof typeof  MessageTypeRegex];
+			const regex = MessageTypeRegex[x as keyof typeof MessageTypeRegex];
 		});
 
 

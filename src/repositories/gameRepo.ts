@@ -14,6 +14,7 @@ export class GameRepo extends BaseRepo {
 	}
 
 	public processMessage(data: any) {
+		this.socketServer.in("room-" + data.id).emit("rconHandler", data);
 		if (data.message === "ping") {
 			return;
 		}
