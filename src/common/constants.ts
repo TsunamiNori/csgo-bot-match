@@ -2,7 +2,7 @@ export const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret";
 export const SALT_SECRET = parseInt(process.env.SALT_SECRET as string, 0) || 10;
 
 export enum MsgEvent {
-	CONNECT = "connect",
+	CONNECT = "connection",
 	DISCONNECT = "disconnect",
 	MESSAGE = "message",
 	IDENTITY = "identity",
@@ -36,6 +36,6 @@ export enum MessageTypeRegex {
 	THREW_ITEM = "\"(?<user_name>.+)[<](?<user_id>\\d+)[>][<](?<steam_id>.*)[>][<](?<user_team>CT|TERRORIST|Unassigned|Spectator)[>]\" threw (?<stuff>hegrenade|flashbang|smokegrenade|decoy|molotov) \\[(?<pos_x>[-]?[0-9]+) (?<pos_y>[-]?[0-9]+) (?<pos_z>[-]?[0-9]+)]",
 	LEFT_BUYZONE = "\"(?<user_name>.+)[<](?<user_id>\\d+)[>][<](?<steam_id>.*)[>][<](?<user_team>CT|TERRORIST|Unassigned|Spectator)[>]\" left buyzone with",
 	PLAYER_DROPPED_BOMD = "\"(?<attackerName>.*)[<](?<attackerUserId>\\d+)[>][<](?<attackerSteamId>.*)[>][<](?<attackerTeam>CT|TERRORIST|Unassigned|Spectator)[>]\" triggered \"Dropped_The_Bomb\"",
-	KILL_ASSIST = "\"(?<attackerName>.*)[<](?<attackerUserId>\\d+)[>][<](?<attackerSteamId>.*)[>][<](?<attackerTeam>CT|TERRORIST|Unassigned|Spectator)[>]\" assisted killing \"(?<victimName>.*)[<](?<victeamUserId>\\d+)[>][<](?<victimSteamId>.*)[>][<](?<victimTeam>CT|TERRORIST|Unassigned|Spectator)[>]\"",
+	// KILL_ASSIST = "\"(?<attackerName>.*)[<](?<attackerUserId>\\d+)[>][<](?<attackerSteamId>.*)[>][<](?<attackerTeam>CT|TERRORIST|Unassigned|Spectator)[>]\" assisted killing \"(?<victimName>.*)[<](?<victeamUserId>\\d+)[>][<](?<victimSteamId>.*)[>][<](?<victimTeam>CT|TERRORIST|Unassigned|Spectator)[>]\"",
 	FREEZING_START = "Starting Freeze period"
 }

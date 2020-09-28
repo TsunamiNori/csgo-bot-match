@@ -51,15 +51,5 @@ export class Application {
 		});
 
 
-		// Working RCON
-		// let Rcon = require('../rcon');
-		// let rcon = Rcon({
-		// 	address: '14.177.236.119:20003',
-		// 	password: 'vikings_compe@123#@!'
-		// });
-		// rcon.connect().then(() => {
-		// 	console.log('srcds server connected');
-		// 	rcon.command('say HI FROM vBOT');
-		// }).catch(console.error);
 	}
 }

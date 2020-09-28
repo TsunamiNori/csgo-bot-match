@@ -1,77 +1,77 @@
-'use strict';
+"use strict";
 
-let net = require('net');
+import net from "net";
+import {add} from "winston";
 
-module.exports = (address: string) => {
-	let connection: any;
+class Connection {
+	private connection: any;
+	private address: string;
 
-	return Object.freeze({
-		create: create,
-		send: send,
-		getData: getData,
-		destroy: destroy
-	});
+	constructor(address: string) {
+		this.address = address;
+	}
 
-	function create() {
-		return _createConnection().then(newConnection => {
-			connection = newConnection;
+	create() {
+		return this._createConnection().then(newConnection => {
+			this.connection = newConnection;
 
-			connection.on('close', _disconnectHandler);
+			this.connection.on("close", this._disconnectHandler);
 		});
 	}
 
-	function destroy() {
-		return _destroyConnection();
+	destroy() {
+		return this._destroyConnection();
 	}
 
-	function _createConnection() {
+	_createConnection() {
 		return new Promise((resolve, reject) => {
-			let host = address.split(':')[0];
-			let port = Number(address.split(':')[1]) || 27015;
-			let connection = net.createConnection({
-				host: host,
-				port: port
+			const host = this.address.split(":")[0];
+			const port = Number(this.address.split(":")[1]) || 27015;
+			const connection = net.createConnection({
+				host,
+				port
 			}, () => {
-				connection.removeListener('error', errorHandler);
-				connection.on('error', _errorHandler);
+				connection.removeListener("error", errorHandler);
+				connection.on("error", this._errorHandler);
 				resolve(connection);
 			});
 
-			connection.on('error', errorHandler);
+			connection.on("error", errorHandler);
 
 			function errorHandler(err: Error) {
-				connection.removeListener('error', errorHandler);
+				connection.removeListener("error", errorHandler);
 				reject(err);
 			}
 		});
 	}
 
-	function _destroyConnection() {
+	_destroyConnection() {
 		return new Promise((resolve, reject) => {
-			if (connection) {
-				//end would not ever "End..."
-				connection.destroy();
+			if (this.connection) {
+				// end would not ever "End..."
+				this.connection.destroy();
 
-				connection.on('close', resolve);
+				this.connection.on("close", resolve);
 			} else {
 				resolve();
 			}
 		});
 	}
 
-	function _errorHandler(err: Error) {
+	_errorHandler(err: Error) {
 		console.error(err);
 	}
 
-	function _disconnectHandler() {
-		connection = undefined;
+	_disconnectHandler() {
+		this.connection = undefined;
 	}
 
-	function getData(cbSync: any) {
+	getData(cbSync: any) {
+		const thisConnection = this.connection;
 		return new Promise((resolve, reject) => {
-			connection.removeListener('error', _errorHandler);
-			connection.on('error', errorHandler);
-			connection.on('data', dataHandler);
+			this.connection.removeListener("error", this._errorHandler);
+			this.connection.on("error", errorHandler);
+			this.connection.on("data", dataHandler);
 
 			function dataHandler(data: any) {
 				if (cbSync === false) {
@@ -89,14 +89,18 @@ module.exports = (address: string) => {
 			}
 
 			function resetListeners() {
-				connection.removeListener('error', errorHandler);
-				connection.removeListener('data', dataHandler);
-				connection.on('error', _errorHandler);
+				thisConnection.removeListener("error", errorHandler);
+				thisConnection.removeListener("data", dataHandler);
+				thisConnection.on("error", (err: Error) => {
+					console.log(err);
+				});
 			}
 		});
 	}
 
-	function send(buffer: Buffer) {
-		connection.write(buffer);
+	send(buffer: Buffer) {
+		this.connection.write(buffer);
 	}
-};
+}
+
+export default Connection;

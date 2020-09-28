@@ -1,4 +1,4 @@
-import SocketIO from "socket.io";
+import SocketIO, {Socket} from "socket.io";
 import dgram from "dgram";
 import {AddressInfo} from "net";
 import {MsgEvent} from "../common/constants";
@@ -15,22 +15,25 @@ export class SocketServer {
 	private readonly socketAddress: string;
 
 	constructor(httpServer: Server, appPort: number) {
-		SocketServer.logger = (new Logger("green")).create();
-		SocketServer.io = SocketIO(httpServer);
+		SocketServer.logger = (new Logger("cyan")).create();
 		this.socketPort = appPort;
-		this.socketAddress = "0.0.0.0"; // 0.0.0.0 means all interface
+		this.socketAddress = process.env.HOST as string || "0.0.0.0"; // 0.0.0.0 means all interface
+		SocketServer.io = SocketIO(httpServer);
 		this.socketWorker();
 	}
-	private socketWorker(): void {
-		SocketServer.io.on(MsgEvent.CONNECT, (socket: any) => {
-			SocketServer.logger.info(`Client connected`);
 
-			socket.on("identify", (data: any) => {
-				console.info(data);
+	private socketWorker(): void {
+		SocketServer.io.on(MsgEvent.CONNECT, (socket: Socket) => {
+			// SocketServer.logger.info(`Client connected ${socket.client.id}`);
+			socket.on("test", (data: any) => {
+				SocketServer.logger.info(`Test data received from ${socket.client.id}`);
 			});
 			socket.on(MsgEvent.DISCONNECT, () => {
-				SocketServer.logger.info("Client disconnected");
+				SocketServer.logger.info(`Client disconnected ${socket.client.id}`);
 			});
+			setInterval(() => {
+				socket.emit("test");
+			}, 1000);
 		});
 	}
 }
