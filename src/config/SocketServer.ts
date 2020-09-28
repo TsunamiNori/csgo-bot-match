@@ -33,7 +33,7 @@ export class SocketServer {
 			});
 			setInterval(() => {
 				socket.emit("test");
-			}, 1000);
+			}, 5000);
 		});
 	}
 }

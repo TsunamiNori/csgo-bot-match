@@ -1,14 +1,16 @@
 "use strict";
 
 import net from "net";
-import {add} from "winston";
+import winston, {add} from "winston";
 
 class Connection {
 	private connection: any;
 	private address: string;
+	private logger: winston.Logger;
 
-	constructor(address: string) {
+	constructor(address: string, logger: winston.Logger) {
 		this.address = address;
+		this.logger = logger;
 	}
 
 	create() {
@@ -59,7 +61,7 @@ class Connection {
 	}
 
 	_errorHandler(err: Error) {
-		console.error(err);
+		this.logger.error(err);
 	}
 
 	_disconnectHandler() {
@@ -69,7 +71,7 @@ class Connection {
 	getData(cbSync: any) {
 		const thisConnection = this.connection;
 		return new Promise((resolve, reject) => {
-			this.connection.removeListener("error", this._errorHandler);
+			this.connection.removeListener("error", errorHandler);
 			this.connection.on("error", errorHandler);
 			this.connection.on("data", dataHandler);
 
@@ -91,9 +93,6 @@ class Connection {
 			function resetListeners() {
 				thisConnection.removeListener("error", errorHandler);
 				thisConnection.removeListener("data", dataHandler);
-				thisConnection.on("error", (err: Error) => {
-					console.log(err);
-				});
 			}
 		});
 	}

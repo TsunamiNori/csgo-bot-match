@@ -8,8 +8,8 @@ export class Logger {
 	private ignoreLevel: boolean;
 
 	constructor(
-							color: ("cyan" | "yellow" | "red" | "green" | "blue" | "white") = "white",
-							ignoreLevel: boolean = false) {
+		color: ("cyan" | "yellow" | "red" | "green" | "blue" | "white") = "white",
+		ignoreLevel: boolean = false) {
 		this.log = winston.createLogger({
 			format: winston.format.combine(
 				winston.format.timestamp(),
@@ -84,10 +84,16 @@ export class Logger {
 		});
 
 		const timestampFormat = winston.format.timestamp({format: "MM-DD HH:mm:ss.SSSZZ"});
-
+		const errorStackTracerFormat = winston.format(info => {
+			if (info.meta && info.meta instanceof Error) {
+				info.message = `${info.message} ${info.meta.stack}`;
+			}
+			return info;
+		});
 		this.log.add(
 			new winston.transports.Console({
-				format: winston.format.combine(timestampFormat, formFormat),
+				format: winston.format.combine(winston.format.splat(), // Necessary to produce the 'meta' property
+					errorStackTracerFormat(), timestampFormat, formFormat),
 			}),
 		);
 		return this.log;

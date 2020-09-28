@@ -1,4 +1,5 @@
 "use strict";
+// require("./debugger"); // Uncomment this line to enable debugger for eventListener warning
 // reflect-metadata shim is required, requirement of routing-controllers module.
 import "reflect-metadata";
 import {Application} from "./config/Application";

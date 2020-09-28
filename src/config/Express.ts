@@ -99,7 +99,7 @@ export class ExpressConfig {
 
 		const errorFn = (err: any): void => {
 			cleanup();
-			this.logger.error(`Request pipeline error: ${err}`);
+			this.logger.error(err);
 		};
 
 		res.on("finish", logFn); // successful pipeline (regardless of its response)

@@ -38,11 +38,11 @@ export class Application {
 		this.socket = new SocketServer(this.server, appPort);
 
 		process.on("uncaughtException", (e: any) => {
-			this.logger.error(e.message);
+			this.logger.error(e);
 			process.exit(1);
 		});
 		process.on("unhandledRejection", (e: any) => {
-			this.logger.error(e.message);
+			this.logger.error(e);
 			process.exit(1);
 		});
 

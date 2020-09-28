@@ -11,6 +11,7 @@ class UDPWorker {
 	private readonly udpServer = dgram.createSocket("udp4");
 	private readonly address: string;
 	private readonly port: number;
+	private readonly publicAddress: string;
 	private logger: winston.Logger;
 	private busyStatus: boolean;
 	private rcon: any;
@@ -24,6 +25,7 @@ class UDPWorker {
 			secure: false,
 			reconnection: true,
 		});
+		this.publicAddress = process.env.PUBLIC_ADDRESS || "127.0.0.1";
 		this.busyStatus = true;
 
 	}
@@ -57,13 +59,27 @@ class UDPWorker {
 			}
 		);
 		this.rcon.connect().then(() => {
-			this.rcon.command("echo vBOT");
+			try {
+				this.rcon.command("echo vBOT").then(() => {
+					this.rcon.command(`logaddress_del ${this.publicAddress}:${this.port}`).then().catch((err: Error) => this.logger.error(err));
+					this.rcon.command(`logaddress_add ${this.publicAddress}:${this.port}`).then().catch((err: Error) => this.logger.error(err));
+				}).catch((err: Error) => {
+					this.logger.error(`Rcon first init failed`);
+					this.logger.error(err);
+				});
+			} catch (e) {
+				this.logger.error(e);
+			}
 		}).catch((err: Error) => {
-			this.logger.error(`Failed to connect to CSGO Server. ${err.message}`);
+			this.logger.error(`Failed to connect to CSGO Server. ${err}`);
 		});
 		this.io.on("test", (message: any) => {
-			this.rcon.command("echo vBOT");
-			this.rcon.command("logaddress_add ");
+			this.rcon.command("echo vBOT").then((data: any) => {
+				// this.logger.info(`-- ${typeof data === "string" ? data : JSON.stringify(data)} --`);
+			}).catch((error: Error) => {
+				this.logger.info(`RCON Command failed: ${error.message}`);
+				this.logger.info(error);
+			});
 		});
 	}
 
