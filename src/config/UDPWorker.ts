@@ -7,7 +7,9 @@ import SocketClient from "socket.io-client";
 import Rcon from "../rcon";
 
 class UDPWorker {
-	private readonly io: SocketIOClient.Socket;
+	private io: SocketIOClient.Socket | undefined;
+	private readonly socketAddress: string;
+	private readonly socketPort: number;
 	private readonly udpServer = dgram.createSocket("udp4");
 	private readonly address: string;
 	private readonly port: number;
@@ -21,12 +23,10 @@ class UDPWorker {
 		this.udpServer = dgram.createSocket("udp4");
 		this.address = address;
 		this.port = port;
-		this.io = SocketClient.connect(`http://${socketAddress}:${socketPort}`, {
-			secure: false,
-			reconnection: true,
-		});
 		this.publicAddress = process.env.PUBLIC_ADDRESS || "127.0.0.1";
 		this.busyStatus = true;
+		this.socketAddress = socketAddress;
+		this.socketPort = socketPort;
 
 	}
 
@@ -35,6 +35,13 @@ class UDPWorker {
 	}
 
 	public start(rconAddress: string, rconPassword: string): void {
+
+		this.logger.info(`UDP Server@${this.address}:${this.port} is connecting to http://${this.socketAddress}:${this.socketPort}`);
+		this.io = SocketClient.connect(`http://${this.socketAddress}:${this.socketPort}`, {
+			secure: false,
+			reconnection: true,
+		});
+
 		const udpSvr = this.udpServer;
 		udpSvr.on("listening", () => {
 			const address: AddressInfo = udpSvr.address() as AddressInfo;

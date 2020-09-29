@@ -38,10 +38,12 @@ export class Application {
 		this.socket = new SocketServer(this.server, appPort);
 
 		process.on("uncaughtException", (e: any) => {
+			console.log(e);
 			this.logger.error(e);
 			process.exit(1);
 		});
 		process.on("unhandledRejection", (e: any) => {
+			console.log(e);
 			this.logger.error(e);
 			process.exit(1);
 		});
@@ -49,7 +51,9 @@ export class Application {
 		Object.keys(MessageTypeRegex).forEach(x => {
 			const regex = MessageTypeRegex[x as keyof typeof MessageTypeRegex];
 		});
+	}
 
-
+	public start() {
+		// Empty function
 	}
 }

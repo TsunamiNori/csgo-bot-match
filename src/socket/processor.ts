@@ -23,7 +23,7 @@ export class MessageProcessor {
 			return testResult;
 		});
 		if (msgType.length === 0) {
-			console.info(`Unknown message type to process ${message}`);
+			MessageProcessor.logger.info(`Unknown message type to process ${message}`);
 			return;
 		}
 		MessageProcessor.logger.info(`[${msgType}]: ${message}`);

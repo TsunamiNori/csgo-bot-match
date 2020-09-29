@@ -7,7 +7,6 @@ import cluster from "cluster";
 import {cpus} from "os";
 import UDPWorker from "./config/UDPWorker";
 import {Logger} from "./common/logger";
-
 const logger = (new Logger()).create();
 const startMode = process.env.START_MODE || "both";
 
@@ -17,8 +16,10 @@ const workerMode = () => {
 
 const clusterMode = () => {
 	if (cluster.isMaster) {
-		new Application();
-		for (let i = 0, coreCount = (cpus().length / 2); i < coreCount; i++) {
+		const app = new Application();
+		app.start();
+		require("./runner");
+		for (let i = 0, coreCount = (cpus().length / 2); i < 1; i++) {
 			cluster.fork();
 		}
 

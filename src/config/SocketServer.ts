@@ -15,7 +15,7 @@ export class SocketServer {
 	private readonly socketAddress: string;
 
 	constructor(httpServer: Server, appPort: number) {
-		SocketServer.logger = (new Logger("cyan")).create();
+		SocketServer.logger = (new Logger("red")).create();
 		this.socketPort = appPort;
 		this.socketAddress = process.env.HOST as string || "0.0.0.0"; // 0.0.0.0 means all interface
 		SocketServer.io = SocketIO(httpServer);
@@ -29,10 +29,11 @@ export class SocketServer {
 				SocketServer.logger.info(`Test data received from ${socket.client.id}`);
 			});
 			socket.on(MsgEvent.DISCONNECT, () => {
-				SocketServer.logger.info(`Client disconnected ${socket.client.id}`);
+				// SocketServer.logger.info(`Client disconnected ${socket.client.id}`);
 			});
 			setInterval(() => {
-				socket.emit("test");
+				// SocketServer.logger.info(`Processing to send test event to client`);
+				socket.emit("test", {data: "test"});
 			}, 5000);
 		});
 	}
