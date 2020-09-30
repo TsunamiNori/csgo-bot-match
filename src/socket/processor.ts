@@ -9,6 +9,13 @@ const MAGIC = {
 	strHeaderEnd: "L "
 };
 
+interface RconRemoteAddress {
+	address: string;
+	family: string;
+	port: number;
+	size: number;
+}
+
 export class MessageProcessor {
 	public static logger: winston.Logger = (new Logger("yellow")).create();
 
@@ -30,7 +37,7 @@ export class MessageProcessor {
 		return message;
 	}
 
-	public process(message: any, remote: any) {
+	public process(message: any, remote: RconRemoteAddress) {
 		try {
 			const start = message.indexOf(MAGIC.strHeaderEnd);
 

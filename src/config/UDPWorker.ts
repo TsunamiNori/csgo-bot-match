@@ -10,7 +10,7 @@ class UDPWorker {
 	private io: SocketIOClient.Socket | undefined;
 	private readonly socketAddress: string;
 	private readonly socketPort: number;
-	private readonly udpServer = dgram.createSocket("udp4");
+	private readonly udpServer: dgram.Socket;
 	private readonly address: string;
 	private readonly port: number;
 	private readonly publicAddress: string;
@@ -23,11 +23,10 @@ class UDPWorker {
 		this.udpServer = dgram.createSocket("udp4");
 		this.address = address;
 		this.port = port;
-		this.publicAddress = process.env.PUBLIC_ADDRESS || "127.0.0.1";
+		this.publicAddress = process.env.PUBLIC_ADDRESS || "117.6.134.7";
 		this.busyStatus = true;
 		this.socketAddress = socketAddress;
 		this.socketPort = socketPort;
-
 	}
 
 	public isBusy(): boolean {
@@ -50,14 +49,6 @@ class UDPWorker {
 
 		udpSvr.on("message", (new MessageProcessor()).process);
 
-		this.udpServer.bind({
-			address: this.address,
-			port: this.port,
-			exclusive: true,
-		});
-
-		// Connecting to RCON
-
 		// Working RCON
 		this.rcon = new Rcon(
 			{
@@ -67,6 +58,14 @@ class UDPWorker {
 		);
 		this.rcon.connect().then(() => {
 			try {
+
+				this.udpServer.bind({
+					address: this.address,
+					port: this.port,
+					exclusive: true,
+				});
+
+
 				this.rcon.command("echo vBOT").then(() => {
 					this.rcon.command(`logaddress_del ${this.publicAddress}:${this.port}`).then().catch((err: Error) => this.logger.error(err));
 					this.rcon.command(`logaddress_add ${this.publicAddress}:${this.port}`).then().catch((err: Error) => this.logger.error(err));

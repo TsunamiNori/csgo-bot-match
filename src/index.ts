@@ -36,7 +36,7 @@ const clusterMode = () => {
 		const udpWorker = new UDPWorker("1", host,
 			parseInt(process.env.WORKER_START_PORT as string || "12600", 0) + workerId,
 			socketHost, socketPort);
-		udpWorker.start("14.177.236.119:40003", "vikings@123#@!");
+		udpWorker.start("127.0.0.1:20001", "vikings_compe@123#@!");
 	}
 };
 

@@ -92,20 +92,21 @@ class Rcon {
 					body: text
 				});
 				const ackId = this._getNextPacketId();
-				const ack = packet.request({
-					id: ackId,
-					type: packet.SERVERDATA_EXECCOMMAND,
-					body: ""
-				});
+				// const ack = packet.request({
+				// 	id: ackId,
+				// 	type: packet.SERVERDATA_EXECCOMMAND,
+				// 	body: ""
+				// });
 				this._connection.send(req);
-				this._connection.send(ack);
+				// this._connection.send(ack);
 				this._connection.getData(dataHandler).then(done);
 
 				function dataHandler(data: any) {
 					const res = packet.response(data);
 					if (res.id === ackId) {
 						return false;
-					} else if (res.id === reqId) {
+					} else
+						if (res.id === reqId) {
 						// More data to come
 						responseData = Buffer.concat([responseData, res.payload], responseData.length + res.payload.length);
 						return true;
