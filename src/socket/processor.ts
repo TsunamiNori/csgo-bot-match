@@ -18,8 +18,10 @@ interface RconRemoteAddress {
 
 export class MessageProcessor {
 	public static logger: winston.Logger = (new Logger("yellow")).create();
+	private processor: ProcessMessage;
 
 	constructor() {
+		this.processor = new ProcessMessage();
 	}
 
 	public static messageToType(message: string) {
@@ -33,8 +35,8 @@ export class MessageProcessor {
 			MessageProcessor.logger.info(`Unknown message type to process ${message}`);
 			return;
 		}
-		MessageProcessor.logger.info(`[${msgType}]: ${message}`);
-		return message;
+		// MessageProcessor.logger.info(`[${msgType}]: ${message}`);
+		return msgType[0];
 	}
 
 	public process(message: any, remote: RconRemoteAddress) {
@@ -46,9 +48,24 @@ export class MessageProcessor {
 			}
 			const processedMsg = message.slice(start + MAGIC.strHeaderEnd.length, message.length - 2).toString();
 			const msgType = MessageProcessor.messageToType(processedMsg);
+			switch (msgType) {
+				case MessageTypeRegex.ATTACKED:
+					break;
+				case MessageTypeRegex.ROUND_SCORED:
+					this.processor.roundScore(message);
+					break;
+				default:
+					return;
+			}
 		} catch (e) {
 			console.log(e);
 		}
 	}
 
+}
+
+class ProcessMessage {
+	public roundScore(message: string) {
+
+	}
 }
