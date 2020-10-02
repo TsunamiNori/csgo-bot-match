@@ -11,10 +11,9 @@ import winston from "winston";
 
 export class ExpressConfig {
 	public app: express.Application;
-	private static logger: winston.Logger;
+	private static logger: winston.Logger = (new Logger("green")).create();
 
 	public constructor() {
-		ExpressConfig.logger = (new Logger("green")).create();
 		this.app = express();
 		this.app.use(bodyParser.urlencoded({extended: false}));
 		this.app.use(bodyParser.json());
@@ -58,7 +57,7 @@ export class ExpressConfig {
 		res: Response,
 		next: any,
 	): void {
-		this.logger.info(err);
+		ExpressConfig.logger.info(err);
 		if (err.hasOwnProperty("thrown")) {
 			res.send({
 				error: err.message,
@@ -75,7 +74,7 @@ export class ExpressConfig {
 	}
 
 	public static logRequestStart(req: Request, res: Response, next: any): void {
-		this.logger.info(`[Express] ${(new Date())} | ` +
+		ExpressConfig.logger.info(`[Express] ${(new Date())} | ` +
 			`${req.headers["x-forwarded-for"] || req.connection.remoteAddress || req.socket.remoteAddress}` +
 			` - ${req.method} - ${req.originalUrl} - ${JSON.stringify(req.body)} - ${req.headers["user-agent"]}`);
 
@@ -87,19 +86,19 @@ export class ExpressConfig {
 
 		const logFn = (): void => {
 			cleanup();
-			this.logger.info(`[Express] ${(new Date())} | ` +
+			ExpressConfig.logger.info(`[Express] ${(new Date())} | ` +
 				`${req.headers["x-forwarded-for"] || req.connection.remoteAddress || req.socket.remoteAddress}` +
 				` - ${req.method} ${req.originalUrl} ${res.statusMessage}; ${res.get("Content-Length") || 0}b sent`);
 		};
 
 		const abortFn = (): void => {
 			cleanup();
-			this.logger.warn("[Express] Request aborted by the client");
+			ExpressConfig.logger.warn("[Express] Request aborted by the client");
 		};
 
 		const errorFn = (err: any): void => {
 			cleanup();
-			this.logger.error(err);
+			ExpressConfig.logger.error(err);
 		};
 
 		res.on("finish", logFn); // successful pipeline (regardless of its response)

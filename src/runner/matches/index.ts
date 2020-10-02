@@ -1,52 +1,46 @@
 "use strict";
 import {Logger} from "../../common/logger";
 import winston from "winston";
+import {Model} from "mongoose";
+import {Match, matchSchema} from "../../models/mongo/match";
+import {MongoDB} from "../../database/MongoDB";
+import cluster from "cluster";
 
-
-export default class Matches {
+export default class MatchManager {
 	private static logger: winston.Logger;
-	private readonly matchId: number;
 	private readonly matchStatus: number;
 	private readonly matchInfo: any;
+	private matchDb: Model<Match>;
+	private processingMatches: String[] = [];
 
-	constructor(matchId: number) {
-		Matches.logger = (new Logger("blue")).create();
+	constructor(matchInfo: any) {
+		MatchManager.logger = (new Logger("blue")).create();
+
+		this.matchDb = MongoDB.mongooseConnection.model<Match>(
+			"matches",
+			matchSchema,
+		);
 		this.matchStatus = Math.random() * 100;
-		this.matchId = matchId;
-		this.matchInfo = {
-			server_info: {
-				ip: "127.0.0.1",
-				port: 27017,
-				rcon_password: "",
-				team_1: {
-					id: 0,
-					name: "Team A",
-					flag: "VN",
-				},
-				team_2: {
-					id: 0,
-					name: "Team B",
-					flag: "VN"
-				},
-				status: this.matchStatus,
-				configs: {
-					map: "de_dust2",
-					overtime: true,
-					max_round: 15,
-					rules: "esl5on5",
-					ot_money: 10000,
-					ot_max_round: 3,
-					ot_enabled: true,
-					password: "vikings",
-					auto_start: false
-				}
-			}
-		};
-		Matches.logger.info(`Match ${matchId} created with status ${this.matchStatus}`)
+		this.matchInfo = matchInfo;
 	}
 
-	public checkMatches() {
-		Matches.logger.info(`Checking matches ${this.matchId} - ${this.matchStatus}`);
+	public async checkMatches() {
+		const matches = await this.matchDb.find({
+			status: 0,
+		}).exec();
+
+		if (matches.length > 0) {
+			MatchManager.logger.info(`Found ${matches.length} new matches. Processing`);
+			matches.forEach((match) => {
+				if (this.processingMatches.indexOf(match._id.toString()) !== -1) {
+					return;
+				}
+				console.info(typeof match._id);
+				this.processingMatches.push(match._id.toString());
+				cluster.fork({MATCH_DATA: JSON.stringify(match)});
+			})
+		}
+
 		setTimeout(() => {
 			this.checkMatches();
 		}, 3000);

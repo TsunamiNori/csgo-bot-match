@@ -5,7 +5,6 @@ export class SnowFlakeOptions {
 	public offset: number = (2019 - 1970) * 31536000 * 1000;
 }
 
-// tslint:disable-next-line:max-classes-per-file
 export class Snowflake {
 	private seq: number;
 	private mid: number;

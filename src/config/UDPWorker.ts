@@ -5,6 +5,7 @@ import winston from "winston";
 import {Logger} from "../common/logger";
 import SocketClient from "socket.io-client";
 import Rcon from "../rcon";
+import Matches from "../runner/matches";
 
 class UDPWorker {
 	private io: SocketIOClient.Socket | undefined;
@@ -44,7 +45,7 @@ class UDPWorker {
 		const udpSvr = this.udpServer;
 		udpSvr.on("listening", () => {
 			const address: AddressInfo = udpSvr.address() as AddressInfo;
-			this.logger.info("UDP Server listening on " + address.address + ":" + address.port);
+			// this.logger.info("UDP Server listening on " + address.address + ":" + address.port);
 		});
 
 		udpSvr.on("message", (new MessageProcessor()).process);
@@ -56,6 +57,7 @@ class UDPWorker {
 				password: rconPassword
 			}
 		);
+		// this.logger.info(`Connecting to CSGO Server: ${rconAddress} - ${rconPassword}`);
 		this.rcon.connect().then(() => {
 			try {
 
@@ -78,6 +80,7 @@ class UDPWorker {
 			}
 		}).catch((err: Error) => {
 			this.logger.error(`Failed to connect to CSGO Server. ${err}`);
+			process.exit();
 		});
 		this.io.on("test", (message: any) => {
 			this.rcon.command("echo vBOT").then((data: any) => {
@@ -87,6 +90,38 @@ class UDPWorker {
 				this.logger.info(error);
 			});
 		});
+		this.io.on("newMatch", (message: any) => {
+			const matches = new Matches({
+				server_info: {
+					ip: "127.0.0.1",
+					port: 27017,
+					rcon_password: "",
+					team_1: {
+						id: 0,
+						name: "Team A",
+						flag: "VN",
+					},
+					team_2: {
+						id: 0,
+						name: "Team B",
+						flag: "VN"
+					},
+					status: 0, // 0: Newly created
+					configs: {
+						map: "de_dust2",
+						overtime: true,
+						max_round: 15,
+						rules: "esl5on5",
+						ot_money: 10000,
+						ot_max_round: 3,
+						ot_enabled: true,
+						password: "vikings",
+						auto_start: false
+					}
+				}
+			});
+		});
+
 	}
 
 }

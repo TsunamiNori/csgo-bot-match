@@ -7,6 +7,7 @@ import cluster from "cluster";
 import {cpus} from "os";
 import UDPWorker from "./config/UDPWorker";
 import {Logger} from "./common/logger";
+import {Match} from "./models/mongo/match";
 const logger = (new Logger()).create();
 const startMode = process.env.START_MODE || "both";
 
@@ -19,24 +20,30 @@ const clusterMode = () => {
 		const app = new Application();
 		app.start();
 		require("./runner");
-		for (let i = 0, coreCount = (cpus().length / 2); i < 1; i++) {
-			cluster.fork();
-		}
+		// for (let i = 0, coreCount = (cpus().length / 2); i < 1; i++) {
+		// 	cluster.fork();
+		// }
 
 		cluster.on("exit", (worker, code, signal) => {
-			console.log("worker " + worker.process.pid + " died");
+			logger.warn("UDP Worker " + worker.process.pid + " died");
 		});
 	}
 
 	if (cluster.isWorker) {
 		const workerId = cluster.worker.id;
+		console.log(process.env.MATCH_DATA);
+		if(typeof process.env.MATCH_DATA === 'undefined' || (process.env.MATCH_DATA as string).length < 20){
+			logger.error(`Invalid match data, please double-check: ${process.env.MATCH_DATA}`);
+			process.exit();
+		}
+		const matchInfo: Match = JSON.parse(process.env.MATCH_DATA as string);
 		const host = process.env.HOST || "0.0.0.0";
 		const socketHost = process.env.SOCKET_HOST || "127.0.0.1";
 		const socketPort = parseInt(process.env.SOCKET_PORT || "3000", 0);
 		const udpWorker = new UDPWorker("1", host,
 			parseInt(process.env.WORKER_START_PORT as string || "12600", 0) + workerId,
 			socketHost, socketPort);
-		udpWorker.start("127.0.0.1:20001", "vikings_compe@123#@!");
+		udpWorker.start(`${matchInfo.ip}:${matchInfo.port}`, matchInfo.rcon_password);
 	}
 };
 
