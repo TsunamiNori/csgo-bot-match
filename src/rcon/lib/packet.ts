@@ -35,7 +35,7 @@ module.exports = {
 		};
 	},
 	convertPayload: (buffer: Buffer) => {
-		return buffer.toString("ascii");
+		return buffer.toString("utf-8");
 	},
 	SERVERDATA_AUTH: 0x03,
 	SERVERDATA_AUTH_RESPONSE: 0x02,

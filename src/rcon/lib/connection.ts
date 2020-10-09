@@ -34,7 +34,9 @@ class Connection {
 				port
 			}, () => {
 				connection.removeListener("error", errorHandler);
-				connection.on("error", this._errorHandler);
+				connection.on("error", (err: Error) => {
+					this.logger.error(err);
+				});
 				resolve(connection);
 			});
 
@@ -58,10 +60,6 @@ class Connection {
 				resolve();
 			}
 		});
-	}
-
-	_errorHandler(err: Error) {
-		this.logger.error(err);
 	}
 
 	_disconnectHandler() {

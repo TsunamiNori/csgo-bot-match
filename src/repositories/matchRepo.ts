@@ -32,11 +32,13 @@ export class MatchRepo extends BaseRepo {
 				id: 0,
 				name: "Team A",
 				flag: "VN",
+				score: 0,
 			},
 			team_2: {
 				id: 0,
 				name: "Team B",
-				flag: "VN"
+				flag: "VN",
+				score: 0,
 			},
 			status: 0, // 0: Newly created
 			configs: {
@@ -48,7 +50,8 @@ export class MatchRepo extends BaseRepo {
 				ot_max_round: 3,
 				ot_enabled: true,
 				password: "vikings",
-				auto_start: false
+				auto_start: false,
+				knife: true,
 			}
 		});
 	}

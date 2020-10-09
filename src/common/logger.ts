@@ -8,7 +8,8 @@ export class Logger {
 	private ignoreLevel: boolean;
 
 	constructor(
-		color: ("cyan" | "yellow" | "red" | "green" | "blue" | "white") = "white",
+		color: ("black" | "red" | "green" | "yellow" | "blue" | "magenta" | "cyan" | "white" | "gray" | "grey" | "blackBright"
+			| "redBright" | "greenBright" | "yellowBright" | "blueBright" | "magentaBright" | "cyanBright" | "whiteBright") = "white",
 		ignoreLevel: boolean = false) {
 		this.log = winston.createLogger({
 			format: winston.format.combine(

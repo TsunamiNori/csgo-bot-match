@@ -1,4 +1,4 @@
-import {MessageTypeRegex} from "../common/constants";
+import {MessageType, MessageTypeRegex} from "../common/constants";
 import winston from "winston";
 import {Logger} from "../common/logger";
 
@@ -9,56 +9,78 @@ const MAGIC = {
 	strHeaderEnd: "L "
 };
 
-interface RconRemoteAddress {
+export interface RconRemoteAddress {
 	address: string;
 	family: string;
 	port: number;
 	size: number;
 }
 
+export interface MessageProcessResult {
+	type: string;
+	data: any;
+}
+
 export class MessageProcessor {
-	public static logger: winston.Logger = (new Logger("yellow")).create();
+	public static logger: winston.Logger = (new Logger("redBright")).create();
 	private processor: ProcessMessage;
+	private readonly ignoreMessage = [
+		"server_cvar",
+		"\"sv_",
+		"\"cl_",
+		"\"r_",
+		"-----------------------------------------",
+		"Unknown command"
+	];
 
 	constructor() {
+		console.log(`Processor pwned`);
 		this.processor = new ProcessMessage();
 	}
 
-	public static messageToType(message: string) {
-		const msgType = Object.keys(MessageTypeRegex).filter(x => {
-			const regexStr = MessageTypeRegex[x as keyof typeof MessageTypeRegex];
-			const regex = new RegExp(regexStr);
-			const testResult = regex.test(message);
-			return testResult;
-		});
-		if (msgType.length === 0) {
-			MessageProcessor.logger.info(`Unknown message type to process ${message}`);
-			return;
-		}
-		// MessageProcessor.logger.info(`[${msgType}]: ${message}`);
-		return msgType[0];
+
+	public static async messageToType(message: string): Promise<MessageProcessResult> {
+		let data: MessageProcessResult = {
+			type: MessageType.UNKNOWN,
+			data: {}
+		};
+		data = await (new Promise((resolve, reject) => {
+			const listType = Object.keys(MessageTypeRegex);
+			for (const type of listType) {
+				const regexStr = MessageTypeRegex[type as keyof typeof MessageTypeRegex];
+				const regex = new RegExp(regexStr);
+				const testResult = regex.exec(message);
+				if (testResult !== null && testResult.length > 0) {
+					try {
+						data.type = type;
+						data.data = testResult.groups ?? null;
+					} catch (err) {
+						console.log(58, `Failed to assign regex groups. ${err.message}`);
+					}
+					resolve(data);
+					break;
+				}
+			}
+		}));
+		return data;
 	}
 
-	public process(message: any, remote: RconRemoteAddress) {
+	public async process(message: any, remote: RconRemoteAddress): Promise<MessageProcessResult | null> {
 		try {
 			const start = message.indexOf(MAGIC.strHeaderEnd);
 
 			if (start < 0) {
-				return undefined;
+				return null;
 			}
-			const processedMsg = message.slice(start + MAGIC.strHeaderEnd.length, message.length - 2).toString();
-			const msgType = MessageProcessor.messageToType(processedMsg);
-			switch (msgType) {
-				case MessageTypeRegex.ATTACKED:
-					break;
-				case MessageTypeRegex.ROUND_SCORED:
-					this.processor.roundScore(message);
-					break;
-				default:
-					return;
+			const processedMsg = message.slice(start + MAGIC.strHeaderEnd.length, message.length - 2).toString("utf-8");
+
+			if (new RegExp(this.ignoreMessage.join("|")).test(message)) {
+				return null;
 			}
+			return await MessageProcessor.messageToType(processedMsg);
 		} catch (e) {
 			console.log(e);
+			return null;
 		}
 	}
 

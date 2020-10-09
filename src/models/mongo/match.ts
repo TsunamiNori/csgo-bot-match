@@ -1,20 +1,22 @@
 import {Document, Model, model, Schema} from "mongoose";
 
 export interface Match extends Document {
-	ip: string,
-	port: number,
-	rcon_password: string,
+	ip: string;
+	port: number;
+	rcon_password: string;
 	team_1: {
 		id: number,
 		name: string,
 		flag: string,
-	},
+		score: number,
+	};
 	team_2: {
 		id: number,
 		name: string,
-		flag: string
-	},
-	status: number, // 0: Newly created
+		flag: string,
+		score: number,
+	};
+	status: number; // 0: Newly created
 	configs: {
 		map: string,
 		overtime: boolean,
@@ -24,8 +26,9 @@ export interface Match extends Document {
 		ot_max_round: number,
 		ot_enabled: boolean,
 		password: string,
-		auto_start: boolean
-	}
+		auto_start: boolean,
+		knife: boolean,
+	};
 }
 
 export const matchSchema: Schema = new Schema({
@@ -36,11 +39,13 @@ export const matchSchema: Schema = new Schema({
 		id: Number,
 		name: String,
 		flag: String,
+		score: Number,
 	},
 	team_2: {
 		id: Number,
 		name: String,
-		flag: String
+		flag: String,
+		score: Number,
 	},
 	status: Number, // 0: Newly created
 	configs: {
@@ -52,7 +57,8 @@ export const matchSchema: Schema = new Schema({
 		ot_max_round: Number,
 		ot_enabled: Boolean,
 		password: String,
-		auto_start: Boolean
+		auto_start: Boolean,
+		knife: Boolean,
 	}
 });
 

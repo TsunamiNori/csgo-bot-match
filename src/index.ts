@@ -8,6 +8,7 @@ import {cpus} from "os";
 import UDPWorker from "./config/UDPWorker";
 import {Logger} from "./common/logger";
 import {Match} from "./models/mongo/match";
+
 const logger = (new Logger()).create();
 const startMode = process.env.START_MODE || "both";
 
@@ -31,8 +32,7 @@ const clusterMode = () => {
 
 	if (cluster.isWorker) {
 		const workerId = cluster.worker.id;
-		console.log(process.env.MATCH_DATA);
-		if(typeof process.env.MATCH_DATA === 'undefined' || (process.env.MATCH_DATA as string).length < 20){
+		if (typeof process.env.MATCH_DATA === "undefined" || (process.env.MATCH_DATA as string).length < 20) {
 			logger.error(`Invalid match data, please double-check: ${process.env.MATCH_DATA}`);
 			process.exit();
 		}
@@ -40,10 +40,10 @@ const clusterMode = () => {
 		const host = process.env.HOST || "0.0.0.0";
 		const socketHost = process.env.SOCKET_HOST || "127.0.0.1";
 		const socketPort = parseInt(process.env.SOCKET_PORT || "3000", 0);
-		const udpWorker = new UDPWorker("1", host,
+		const udpWorker = new UDPWorker(matchInfo, host,
 			parseInt(process.env.WORKER_START_PORT as string || "12600", 0) + workerId,
 			socketHost, socketPort);
-		udpWorker.start(`${matchInfo.ip}:${matchInfo.port}`, matchInfo.rcon_password);
+		udpWorker.start();
 	}
 };
 

@@ -92,23 +92,18 @@ class Rcon {
 					body: text
 				});
 				const ackId = this._getNextPacketId();
-				// const ack = packet.request({
-				// 	id: ackId,
-				// 	type: packet.SERVERDATA_EXECCOMMAND,
-				// 	body: ""
-				// });
 				this._connection.send(req);
-				// this._connection.send(ack);
-				this._connection.getData(dataHandler).then(done);
+				this._connection.getData(dataHandler);
 
 				function dataHandler(data: any) {
 					const res = packet.response(data);
 					if (res.id === ackId) {
 						return false;
-					} else
-						if (res.id === reqId) {
+					} else if (res.id === reqId) {
 						// More data to come
 						responseData = Buffer.concat([responseData, res.payload], responseData.length + res.payload.length);
+						const convertedStr = responseData.toString("utf-8");
+						resolve(convertedStr);
 						return true;
 					} else {
 						return handleUnexpectedData(res.id);
@@ -116,8 +111,10 @@ class Rcon {
 				}
 
 				function done() {
-					const responseText = packet.convertPayload(responseData);
-					resolve(responseText);
+					const convertedStr = responseData.toString("utf-8");
+					console.log("done", responseData);
+					console.log("done", convertedStr);
+					resolve(convertedStr);
 				}
 
 				function handleUnexpectedData(id: number) {
