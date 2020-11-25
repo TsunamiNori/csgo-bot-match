@@ -5,7 +5,7 @@ import "reflect-metadata";
 import {Application} from "./config/Application";
 import cluster from "cluster";
 import {cpus} from "os";
-import UDPWorker from "./config/UDPWorker";
+import GameManager from "./config/GameManager";
 import {Logger} from "./common/logger";
 import {Match} from "./models/mongo/match";
 
@@ -26,7 +26,7 @@ const clusterMode = () => {
 		// }
 
 		cluster.on("exit", (worker, code, signal) => {
-			logger.warn("UDP Worker " + worker.process.pid + " died");
+			logger.warn(`Game Manager ID ${worker.process.pid} died`);
 		});
 	}
 
@@ -40,10 +40,9 @@ const clusterMode = () => {
 		const host = process.env.HOST || "0.0.0.0";
 		const socketHost = process.env.SOCKET_HOST || "127.0.0.1";
 		const socketPort = parseInt(process.env.SOCKET_PORT || "3000", 0);
-		const udpWorker = new UDPWorker(matchInfo, host,
-			parseInt(process.env.WORKER_START_PORT as string || "12600", 0) + workerId,
-			socketHost, socketPort);
-		udpWorker.start();
+		const managerStartPort = parseInt(process.env.WORKER_START_PORT as string || "12600", 0) + workerId;
+		const manager = new GameManager(matchInfo, host, managerStartPort, socketHost, socketPort);
+		manager.start();
 	}
 };
 

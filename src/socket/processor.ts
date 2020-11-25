@@ -1,4 +1,4 @@
-import {MessageType, MessageTypeRegex} from "../common/constants";
+import {GameCommand, MessageType, MessageTypeRegex} from "../common/constants";
 import winston from "winston";
 import {Logger} from "../common/logger";
 
@@ -19,6 +19,8 @@ export interface RconRemoteAddress {
 export interface MessageProcessResult {
 	type: string;
 	data: any;
+	isCommand: boolean;
+	command: string;
 }
 
 export class MessageProcessor {
@@ -42,7 +44,9 @@ export class MessageProcessor {
 	public static async messageToType(message: string): Promise<MessageProcessResult> {
 		let data: MessageProcessResult = {
 			type: MessageType.UNKNOWN,
-			data: {}
+			data: {},
+			isCommand: false,
+			command: "",
 		};
 		data = await (new Promise((resolve, reject) => {
 			const listType = Object.keys(MessageTypeRegex);
@@ -54,6 +58,19 @@ export class MessageProcessor {
 					try {
 						data.type = type;
 						data.data = testResult.groups ?? null;
+						if (type === MessageType.SAY && testResult.groups) {
+							if (typeof testResult.groups.text === "string"
+								&& testResult.groups.text.length > 0
+								&& (testResult.groups.text.startsWith("!", 0) || testResult.groups.text.startsWith(".", 0))) {
+								const command = testResult.groups.text.replace("!", "").replace(".", "");
+								for (const commandName of Object.keys(GameCommand)) {
+									if (command.toLowerCase() === commandName.toLowerCase()) {
+										data.isCommand = true;
+										data.command = command.toString();
+									}
+								}
+							}
+						}
 					} catch (err) {
 						console.log(58, `Failed to assign regex groups. ${err.message}`);
 					}

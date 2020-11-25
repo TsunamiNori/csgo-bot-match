@@ -1,4 +1,4 @@
-import {BaseRepo} from "./baseRepo";
+import {BaseRepo} from "./base";
 import {Server} from "socket.io";
 import {SocketServer} from "../config/SocketServer";
 import {Socket} from "dgram";

@@ -1,5 +1,5 @@
 {
-  "name": "csgo-gamebot",
+  "name": "gambit",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -40,7 +40,8 @@
     "eslint-config-prettier": "^4.3.0",
     "prettier": "^1.17.1",
     "tslint": "^5.17.0",
-    "typescript": "^3.5.1"
+    "typescript": "^3.5.1",
+    "vinyl-sourcemaps-apply": "^0.2.1"
   },
   "dependencies": {
     "@types/bcrypt-nodejs": "^0.0.31",
@@ -60,6 +61,9 @@
     "express-ping": "^1.4.0",
     "google-auth-library": "^4.0.0",
     "googleapis": "^40.0.0",
+    "gulp": "^4.0.2",
+    "gulp-append-prepend": "^1.0.8",
+    "gulp-javascript-obfuscator": "^1.1.6",
     "helmet": "^3.18.0",
     "lodash": "^4.17.11",
     "mongoose": "^5.5.11",

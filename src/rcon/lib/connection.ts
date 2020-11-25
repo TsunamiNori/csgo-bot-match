@@ -44,6 +44,7 @@ class Connection {
 
 			function errorHandler(err: Error) {
 				connection.removeListener("error", errorHandler);
+				console.log(47, `SRCDS server connection corrupted`, err);
 				reject(err);
 			}
 		});

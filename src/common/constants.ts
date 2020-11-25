@@ -1,6 +1,18 @@
 export const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret";
 export const SALT_SECRET = parseInt(process.env.SALT_SECRET as string, 0) || 10;
 
+export enum GameCommand {
+	READY = "ready",
+	UNREADY = "unready",
+	PAUSE = "pause",
+	UNPAUSE = "unpause",
+	CONTINUE = "continue",
+	CANCEL = "cancel",
+	BACKUP = "backup",
+	STAY = "stay",
+	SWITCH = "switch",
+}
+
 export enum MsgEvent {
 	CONNECT = "connection",
 	DISCONNECT = "disconnect",
@@ -28,9 +40,11 @@ export enum MessageTypeRegex {
 	PURCHASED = "\"(?<user_name>.+)[<](?<user_id>\\d+)[>][<](?<steam_id>.*)[>][<](?<user_team>CT|TERRORIST|Unassigned|Spectator)[>]\" purchased \"(?<object>.*)\"",
 	ROUND_END = "World triggered \\\"Round_End\\\"",
 	// ROUND_RESTART = "!World triggered \\\"Restart_Round_\((\d+)_(second|seconds)\)\\"!",
-	ROUND_SCORED = "Team \"(?<team>.*)\" triggered \"SFUI_Notice_(?<team_win>Terrorists_Win|CTs_Win|Target_Bombed|Target_Saved|Bomb_Defused)",
+	ROUND_END_TRIGGERED = "Team \"(?<team>.*)\" triggered \"SFUI_Notice_(?<team_win>Terrorists_Win|CTs_Win|Target_Bombed|Target_Saved|Bomb_Defused)\" \\((?<team_one>.*) \\\"(?<team_one_score>\\d+)\\\"\\) \\((?<team_two>.*) \\\"(?<team_two_score>\\d+)\\\"\\)",
 	ROUND_START = "World triggered \"Round_Start\"",
 	MATCH_PAUSED = "Match pause is enabled",
+	MATCH_UNPAUSED = "Match pause is disabled",
+	MATCH_ENDED = "Game Over: competitive (?<map_group>.*) (?<map_name>.*) score (?<score_1>\\d+):(?<score_2>\\d+) after (?<match_time>\\d+) min",
 	SAY = "\"(?<user_name>.+)[<](?<user_id>\\d+)[>][<](?<steam_id>.*)[>][<](?<user_team>CT|TERRORIST|Unassigned|Spectator)[>]\" say \"(?<text>.*)\"",
 	SAY_TEAM = "\"(?<user_name>.+)[<](?<user_id>\\d+)[>][<](?<steam_id>.*)[>][<](?<user_team>CT|TERRORIST|Unassigned|Spectator)[>]\" say_team \"(?<text>.*)\"",
 	TEAM_SWITCH = "\"(?<user_name>.+)[<](?<user_id>\\d+)[>][<](?<steam_id>.*)[>]\" switched from team [<](?<user_team>CT|TERRORIST|Unassigned|Spectator)[>] to [<](?<new_team>CT|TERRORIST|Unassigned|Spectator)[>]",
@@ -47,7 +61,6 @@ export enum MessageType {
 	ATTACKED = "ATTACKED",
 	BOMB_DEFUSING = "BOMB_DEFUSING",
 	BOMB_PLANTING = "BOMB_PLANTING",
-	PLAYER_BLINDED = "PLAYER_BLINDED",
 	MAP_CHANGING = "MAP_CHANGING",
 	MAP_CHANGED = "MAP_CHANGED",
 	PLAYER_NAME_CHANGE = "PLAYER_NAME_CHANGE",
@@ -60,8 +73,11 @@ export enum MessageType {
 	KILL_OTHER = "KILL_OTHER",
 	PURCHASED = "PURCHASED",
 	ROUND_END = "ROUND_END",
-	ROUND_SCORED = "ROUND_SCORED",
+	ROUND_END_TRIGGERED = "ROUND_END_TRIGGERED",
 	ROUND_START = "ROUND_START",
+	MATCH_PAUSED = "MATCH_PAUSED",
+	MATCH_UNPAUSED = "MATCH_UNPAUSED",
+	MATCH_ENDED = "MATCH_ENDED",
 	SAY = "SAY",
 	SAY_TEAM = "SAY_TEAM",
 	TEAM_SWITCH = "TEAM_SWITCH",
@@ -70,6 +86,7 @@ export enum MessageType {
 	LEFT_BUYZONE = "LEFT_BUYZONE",
 	PLAYER_DROPPED_BOMD = "PLAYER_DROPPED_BOMD",
 	KILL_ASSIST = "KILL_ASSIST",
+	PLAYER_BLINDED = "PLAYER_BLINDED",
 	FREEZING_START = "FREEZING_START",
 	UNKNOWN = "UNKNOWN",
 	IGNORE = "IGNORE",
@@ -90,4 +107,6 @@ export enum MatchState {
 	SECOND_SIDE = 35,
 	OT_FIRST_SIDE = 40,
 	OT_SECOND_SIDE = 41,
+	MATCH_PAUSED = 99,
+	MATCH_UNPAUSED = 98,
 }

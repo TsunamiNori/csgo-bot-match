@@ -7,7 +7,7 @@ import {Snowflake} from "../common/flakegen";
 import {MongoDB} from "../database/MongoDB";
 import {User, userSchema} from "../models/mongo/user";
 import {LoginInput, RegisterInput, ResponseResult} from "../models/request/data";
-import {BaseRepo} from "./baseRepo";
+import {BaseRepo} from "./base";
 import ErrorCodes from "../common/error-codes";
 
 export class AuthRepo extends BaseRepo {

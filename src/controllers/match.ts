@@ -1,6 +1,6 @@
 import {Body, Controller, Get, Post, Req, Res} from "routing-controllers";
 import {BaseController} from "./base";
-import {MatchRepo} from "../repositories/matchRepo";
+import {MatchRepo} from "../repositories/match";
 
 @Controller("/api/match")
 export class MatchController extends BaseController {
@@ -11,20 +11,14 @@ export class MatchController extends BaseController {
 		this.matchRepo = new MatchRepo();
 	}
 
-	@Get()
+	@Post()
 	public async CreateMatch(
 		@Body() data: any,
 		@Req() req: any,
 		@Res() res: any): Promise<any> {
 		try {
-			this.matchRepo.createMatch(data);
-			return this.Ok(res, {
-				data: [],
-				message: ``,
-				status: 200,
-				errorCode: 0,
-				error: false,
-			});
+			const result = await this.matchRepo.createMatch(data);
+			return this.Ok(res, result);
 		} catch (e) {
 			return this.BadRequest(res, e);
 		}

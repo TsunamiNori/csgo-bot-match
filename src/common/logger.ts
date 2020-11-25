@@ -1,4 +1,4 @@
-import * as winston from "winston";
+import winston, {format, createLogger, transports} from "winston";
 import chalk from "chalk";
 import DailyRotateFile = require("winston-daily-rotate-file");
 
@@ -11,10 +11,10 @@ export class Logger {
 		color: ("black" | "red" | "green" | "yellow" | "blue" | "magenta" | "cyan" | "white" | "gray" | "grey" | "blackBright"
 			| "redBright" | "greenBright" | "yellowBright" | "blueBright" | "magentaBright" | "cyanBright" | "whiteBright") = "white",
 		ignoreLevel: boolean = false) {
-		this.log = winston.createLogger({
-			format: winston.format.combine(
-				winston.format.timestamp(),
-				winston.format.json(),
+		this.log = createLogger({
+			format: format.combine(
+				format.timestamp(),
+				format.json(),
 			),
 			level: "info",
 			transports: [
@@ -33,13 +33,17 @@ export class Logger {
 					maxSize: 5000000,
 				}),
 			],
+			exceptionHandlers: [
+				new transports.Console(),
+				new transports.File({filename: "combined.log"})
+			]
 		});
 		this.color = color;
 		this.ignoreLevel = ignoreLevel;
 	}
 
 	create() {
-		const formFormat = winston.format.printf(({level, message, timestamp}) => {
+		const formFormat = format.printf(({level, message, timestamp}) => {
 			level = level.toUpperCase();
 			switch (level) {
 				case "INFO":
@@ -84,16 +88,16 @@ export class Logger {
 			return `${this.ignoreLevel ? "" : `${level}`} ${message}`;
 		});
 
-		const timestampFormat = winston.format.timestamp({format: "MM-DD HH:mm:ss.SSSZZ"});
-		const errorStackTracerFormat = winston.format(info => {
+		const timestampFormat = format.timestamp({format: "MM-DD HH:mm:ss.SSSZZ"});
+		const errorStackTracerFormat = format(info => {
 			if (info.meta && info.meta instanceof Error) {
 				info.message = `${info.message} ${info.meta.stack}`;
 			}
 			return info;
 		});
 		this.log.add(
-			new winston.transports.Console({
-				format: winston.format.combine(winston.format.splat(), // Necessary to produce the 'meta' property
+			new transports.Console({
+				format: format.combine(format.splat(), // Necessary to produce the 'meta' property
 					errorStackTracerFormat(), timestampFormat, formFormat),
 			}),
 		);

@@ -1,9 +1,9 @@
 import {Body, Controller, Post, Req, Res} from "routing-controllers";
 import {BaseController} from "./base";
-import {GameRepo} from "../repositories/gameRepo";
+import {GameRepo} from "../repositories/game";
 
-@Controller("/")
-export class AuthController extends BaseController {
+@Controller("/game")
+export class GameController extends BaseController {
 	private gameRepo: GameRepo;
 
 	public constructor() {
